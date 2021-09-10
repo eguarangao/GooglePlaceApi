@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -84,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
                         "&key=" + getResources().getString(R.string.google_map_key);
                 System.out.println("Esta entrando al marke");
                 new PlaceTask().execute(url);
-                System.out.println(new PlaceTask().execute(url));
+                System.out.println("Mi URL: " + url);
             }
         });
     }
@@ -102,10 +103,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSuccess(Location location) {
                 if (location != null) {
-                    currentLat = location.getLatitude();
-                    currentLong = location.getLongitude();
-//                    currentLat = -1.026479292539464;
-//                    currentLong = -79.46986824757668;
+//                    currentLat = location.getLatitude();
+//                    currentLong = location.getLongitude();
+                    currentLat = -1.026479292539464;
+                    currentLong = -79.46986824757668;
                     smf.getMapAsync(new OnMapReadyCallback() {
                         @Override
                         public void onMapReady(GoogleMap googleMap) {
@@ -201,13 +202,15 @@ public class MainActivity extends AppCompatActivity {
                 HashMap<String, String> hashMapList = hashMaps.get(i);
                 double lat = Double.parseDouble(hashMapList.get("lat"));
                 double lng = Double.parseDouble(hashMapList.get("lng"));
+                String referent = hashMapList.get("photo_reference");
                 String name = hashMapList.get("name");
                 LatLng latLng = new LatLng(lat, lng);
                 MarkerOptions options = new MarkerOptions();
                 options.position(latLng);
                 options.title(name);
+                CustomInfoWindowAdapter adaptador = new CustomInfoWindowAdapter(LayoutInflater.from(getApplicationContext()));
+                map.setInfoWindowAdapter(adaptador);
                 map.addMarker(options);
-                System.out.println("Esta pintando");
             }
         }
     }
