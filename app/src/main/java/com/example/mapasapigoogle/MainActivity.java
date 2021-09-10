@@ -22,6 +22,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -57,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         btnShear = findViewById(R.id.btnbuscar);
         smf = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapView2);
         String[] placeTypeList = {"bank", "hospital", "movie_theater", "restaurant"};
-        String[] placeNameList = {"Bank", "Hopital", "Movie Tharter", "Restaurant"};
+        String[] placeNameList = {"Banco", "Hospital", "Cine", "Restaurante"};
 
         //
         spinner.setAdapter(new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_spinner_dropdown_item, placeNameList));
@@ -65,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
         clm = LocationServices.getFusedLocationProviderClient(this);
 
         if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-
             getCurrentLocation();
         } else {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 44);
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
                 //initi
                 String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json" +
                         "?location=" + currentLat + "," + currentLong +
-                        "&radius=5000" +
+                        "&radius=1000" +
                         "&types=" + placeTypeList[i] +
                         "&sensor=true" +
                         "&key=" + getResources().getString(R.string.google_map_key);
@@ -104,7 +104,8 @@ public class MainActivity extends AppCompatActivity {
                 if (location != null) {
                     currentLat = location.getLatitude();
                     currentLong = location.getLongitude();
-
+//                    currentLat = -1.026479292539464;
+//                    currentLong = -79.46986824757668;
                     smf.getMapAsync(new OnMapReadyCallback() {
                         @Override
                         public void onMapReady(GoogleMap googleMap) {
@@ -112,12 +113,17 @@ public class MainActivity extends AppCompatActivity {
                             map = googleMap;
                             //
                             map.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                                    new LatLng(currentLat, currentLong), 10
+                                    new LatLng(currentLat, currentLong), 17
                             ));
+                            LatLng latLng = new LatLng(currentLat, currentLong);
+                            MarkerOptions options = new MarkerOptions();
+                            options.position(latLng);
+                            options.title("Mi casa");
+                            options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+                            map.addMarker(options);
                         }
                     });
                 }
-
             }
         });
     }
@@ -185,6 +191,12 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(List<HashMap<String, String>> hashMaps) {
             map.clear();
+            LatLng latLng_myhouse = new LatLng(currentLat, currentLong);
+            MarkerOptions options_myhouse = new MarkerOptions();
+            options_myhouse.position(latLng_myhouse);
+            options_myhouse.title("Mi casa");
+            options_myhouse.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+            map.addMarker(options_myhouse);
             for (int i = 0; i < hashMaps.size(); i++) {
                 HashMap<String, String> hashMapList = hashMaps.get(i);
                 double lat = Double.parseDouble(hashMapList.get("lat"));
