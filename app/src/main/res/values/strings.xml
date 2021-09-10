@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">MapasApiGoogle</string>
-    <string name="google_map_key" >AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg</string>
+    <string name="google_map_key" >AlzaSyB5MklB5lNnQH1kC1tZ3ATeEsv7z66moKs</string>
+    <string name="buscar">Buscar</string>
 </resources>
