@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
                         "&radius=5000" +
                         "&types" + placeTypeList[i] +
                         "&sensor=true" +
-                        "&key" + getResources().getString(R.string.google_map_key);
+                        "&key=" + getResources().getString(R.string.google_map_key);
                 new PlaceTask().execute(url);
             }
         });
