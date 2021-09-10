@@ -3,6 +3,7 @@
     package="com.example.mapasapigoogle">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
      <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:allowBackup="true"
@@ -13,7 +14,7 @@
         android:theme="@style/Theme.MapasApiGoogle">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyB_qsP8AOP_P0MdlPz-48TDaJYjTP3vbjo"/>
+            android:value="AIzaSyB5MkIB5lNnQH1kC1tZ3ATeEsv7z66moKs"/>
         <activity
             android:name=".MainActivity"
             android:exported="true">

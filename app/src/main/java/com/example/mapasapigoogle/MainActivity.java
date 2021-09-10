@@ -79,10 +79,12 @@ public class MainActivity extends AppCompatActivity {
                 String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json" +
                         "?location=" + currentLat + "," + currentLong +
                         "&radius=5000" +
-                        "&types" + placeTypeList[i] +
+                        "&types=" + placeTypeList[i] +
                         "&sensor=true" +
                         "&key=" + getResources().getString(R.string.google_map_key);
+                System.out.println("Esta entrando al marke");
                 new PlaceTask().execute(url);
+                System.out.println(new PlaceTask().execute(url));
             }
         });
     }
@@ -92,11 +94,14 @@ public class MainActivity extends AppCompatActivity {
     private void getCurrentLocation() {
 
         Task<Location> task;
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
         task = clm.getLastLocation();
         task.addOnSuccessListener(new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(Location location) {
-                if(location!=null){
+                if (location != null) {
                     currentLat = location.getLatitude();
                     currentLong = location.getLongitude();
 
@@ -107,89 +112,90 @@ public class MainActivity extends AppCompatActivity {
                             map = googleMap;
                             //
                             map.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                                    new LatLng(currentLat,currentLong),10
+                                    new LatLng(currentLat, currentLong), 10
                             ));
                         }
                     });
-                 }
+                }
 
             }
         });
     }
 
     private class PlaceTask extends
-            AsyncTask<String,Integer,String> {
+            AsyncTask<String, Integer, String> {
         @Override
-        protected String doInBackground(String... strings){
+        protected String doInBackground(String... strings) {
             String data = null;
-            try{
+            try {
                 data = downloadUrl(strings[0]);
-            }catch(IOException e){
-                e.printStackTrace();
+            } catch (IOException e) {
+                System.out.println("Error: " + e.toString());
             }
             return data;
         }
+
+        private String downloadUrl(String string) throws IOException {
+            URL url = new URL(string);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.connect();
+            InputStream stream = connection.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+            StringBuilder builder = new StringBuilder();
+            String line = "";
+            while ((line = reader.readLine()) != null) {
+                builder.append(line);
+            }
+            String data = builder.toString();
+            reader.close();
+            return data;
+        }
+
+        protected void onPostExecute(String s) {
+            new ParserTask().execute(s);
+        }
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if(requestCode==44){
-            if(grantResults.length>0&&grantResults[0]==PackageManager.PERMISSION_GRANTED){
+        if (requestCode == 44) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 getCurrentLocation();
             }
         }
     }
 
-    private String downloadUrl(String string)throws IOException{
-        URL url = new URL(string);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.connect();
-        InputStream stream = connection.getInputStream();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-        StringBuilder builder = new StringBuilder();
-        String line = "";
-        while((line = reader.readLine())!=null){
-            builder.append(line);
-        }
-        String data = builder.toString();
-        reader.close();
-        return data;
-    }
 
-
-    protected void onPostExecute(String s){
-        new ParserTask().execute(s);
-    }
-
-    private class ParserTask extends AsyncTask<String,Integer, List<HashMap<String,String>>>{
+    private class ParserTask extends AsyncTask<String, Integer, List<HashMap<String, String>>> {
 
         @Override
         protected List<HashMap<String, String>> doInBackground(String... strings) {
             JsonParser jsonParser = new JsonParser();
-            List<HashMap<String,String>>mapList=null;
+            List<HashMap<String, String>> mapList = null;
             JSONObject object = null;
-            try{
+            try {
                 object = new JSONObject(strings[0]);
                 mapList = jsonParser.parseResult(object);
-            }catch (JSONException e){
-                e.printStackTrace();
+            } catch (JSONException e) {
+                System.out.println("Error: " + e.toString());
             }
             return mapList;
         }
+
         @Override
-        protected  void onPostExecute(List<HashMap<String,String>>hashMaps){
+        protected void onPostExecute(List<HashMap<String, String>> hashMaps) {
             map.clear();
-            for (int i=0; i<hashMaps.size();i++){
-                HashMap<String,String>hashMapList = hashMaps.get(i);
+            for (int i = 0; i < hashMaps.size(); i++) {
+                HashMap<String, String> hashMapList = hashMaps.get(i);
                 double lat = Double.parseDouble(hashMapList.get("lat"));
-                double lng=Double.parseDouble(hashMapList.get("lng"));
+                double lng = Double.parseDouble(hashMapList.get("lng"));
                 String name = hashMapList.get("name");
-                LatLng latLng = new LatLng(lat,lng);
+                LatLng latLng = new LatLng(lat, lng);
                 MarkerOptions options = new MarkerOptions();
                 options.position(latLng);
                 options.title(name);
                 map.addMarker(options);
-
-
+                System.out.println("Esta pintando");
             }
         }
     }
